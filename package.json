@@ -2,13 +2,22 @@
   "name": "phasetwo-js",
   "version": "0.0.1",
   "description": "An augmented version of keycloak-js",
-  "main": "index.js",
+  "main": "dist/phasetwo-js.cjs",
+  "module": "dist/phasetwo-js.mjs",
+  "browser": "dist/phasetwo-js.browser.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "keycloak-js": "^9.0.3"
+  },
+  "devDependencies": {
+    "rollup": "^2.7.2"
   }
 }
