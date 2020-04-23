@@ -1,0 +1,15 @@
+*.swp
+*.swo
+*.log
+*.orig
+*.gz
+*.tar
+*.tmp
+node_modules/
+test_results/
+coverage
+pid.txt
+.idea/
+tmp/
+.vscode/
+dist/

@@ -1,0 +1,14 @@
+{
+  "name": "phasetwo-js",
+  "version": "0.0.1",
+  "description": "An augmented version of keycloak-js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "keycloak-js": "^9.0.3"
+  }
+}
