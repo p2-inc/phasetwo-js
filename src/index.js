@@ -4,11 +4,19 @@ class Phasetwo extends Keycloak {
   constructor(config) {
     super(config);
 
-    this.soma = 'Holiday';
+    console.log('config', config);
+
+    if (config.secretOption) {
+      console.log('🔥 You provided a secret config option. Nice.');
+    }
+
+    this.augment = 'new field';
+
+    console.log('👌 Built Phasetwo object.');
   }
 
-  getSoma() {
-    return 'got ' + this.soma;
+  getAugment() {
+    return 'Keycloak object was augmented with: ' + this.augment;
   }
 
   login(options) {
