@@ -1,11 +1,10 @@
 import Keycloak from 'keycloak-js';
 
-class PhaseTwo extends Keycloak {
+class Phasetwo extends Keycloak {
   constructor(config) {
     super(config);
 
-    const { soma } = config;
-    this.soma = soma;
+    this.soma = 'Holiday';
   }
 
   getSoma() {
@@ -21,6 +20,10 @@ class PhaseTwo extends Keycloak {
     console.log('⬅️ Phase Two logging out!');
     return super.logout(options);
   }
+
+  getConfig() {
+    // return the config object
+  }
 }
 
-export default PhaseTwo;
+export default Phasetwo;
