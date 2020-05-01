@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "keycloak-js": "^9.0.3"
+    "keycloak-js": "^10.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.1.0",
