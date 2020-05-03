@@ -6,7 +6,7 @@ class Phasetwo extends Keycloak {
 
     console.log('config', config);
 
-    if (config.secretOption) {
+    if (config && config.secretOption) {
       console.log('🔥 You provided a secret config option. Nice.');
     }
 
