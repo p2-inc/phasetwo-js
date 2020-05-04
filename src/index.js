@@ -10,6 +10,7 @@ class Phasetwo extends Keycloak {
     super(config);
 
     console.log('config', config);
+    this.config = config;
 
     if (config && config.secretOption) {
       console.log('🔥 You provided a secret config option. Nice.');
@@ -36,6 +37,11 @@ class Phasetwo extends Keycloak {
 
   getConfig() {
     // return the config object
+    return this.config;
+  }
+
+  getClientId() {
+    return this.clientId;
   }
 }
 
