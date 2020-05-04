@@ -4,7 +4,6 @@
   "description": "An augmented version of keycloak-js",
   "main": "dist/phasetwo-js.cjs",
   "module": "dist/phasetwo-js.mjs",
-  "browser": "dist/phasetwo-js.browser.js",
   "files": [
     "dist"
   ],
