@@ -14,8 +14,8 @@ export default {
       format: 'es', // ES6 import/export
     },
     {
-      file: pkg.browser,
-      format: 'iife', // immediately invoked function expression (browser style)
+      file: 'dist/phasetwo-js.iife.js',
+      format: 'iife', // immediately invoked function expression
       name: 'Phasetwo', // the global which can be used in a browser
     },
   ],
