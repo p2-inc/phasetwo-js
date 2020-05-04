@@ -6,8 +6,6 @@ function Phasetwo(config) {
   KC.prototype = new Keycloak(config);
 
   class Phasetwo extends KC {
-    config;
-
     constructor(config) {
       super(config);
       this.config = config;
