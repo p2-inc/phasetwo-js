@@ -1,42 +1,45 @@
 import Keycloak from 'keycloak-js';
 
-class Phasetwo extends Keycloak {
-  super_ = {
-    login: this.login,
-    logout: this.logout,
-  };
+function Phasetwo(config) {
+  function KC() {}
 
-  constructor(config) {
-    super(config);
+  KC.prototype = new Keycloak(config);
 
-    console.log('config', config);
+  class Phasetwo extends KC {
+    config;
 
-    if (config && config.secretOption) {
-      console.log('🔥 You provided a secret config option. Nice.');
+    constructor(config) {
+      super(config);
+      this.config = config;
+
+      if (config && config.secretOption) {
+        console.log('🔥 You provided a secret config option. Nice.');
+      }
+
+      console.log('👌 Built Phasetwo object.');
     }
 
-    this.augment = 'new field';
+    login(options) {
+      console.log('➡️ Phase Two logging in!');
+      return super.login(options);
+    }
 
-    console.log('👌 Built Phasetwo object.');
+    logout(options) {
+      console.log('⬅️ Phase Two logging out!');
+      return super.logout(options);
+    }
+
+    init(options) {
+      console.log('🌱 Phase Two init');
+      return super.init(options);
+    }
+
+    getConfig() {
+      return this.config;
+    }
   }
 
-  getAugment() {
-    return 'Keycloak object was augmented with: ' + this.augment;
-  }
-
-  login = (options) => {
-    console.log('➡️ Phase Two logging in!');
-    return this.super_.login(options);
-  };
-
-  logout = (options) => {
-    console.log('⬅️ Phase Two logging out!');
-    return this.super_.logout(options);
-  };
-
-  getConfig() {
-    // return the config object
-  }
+  return new Phasetwo(config);
 }
 
 export default Phasetwo;
