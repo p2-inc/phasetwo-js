@@ -2,6 +2,7 @@ import Keycloak from 'keycloak-js';
 
 class Phasetwo extends Keycloak {
   super_ = {
+    init: this.init,
     login: this.login,
     logout: this.logout,
   };
@@ -9,20 +10,15 @@ class Phasetwo extends Keycloak {
   constructor(config) {
     super(config);
 
-    console.log('config', config);
     this.config = config;
 
     if (config && config.secretOption) {
       console.log('🔥 You provided a secret config option. Nice.');
     }
 
-    this.augment = 'new field';
+    this.augment = config.augment;
 
     console.log('👌 Built Phasetwo object.');
-  }
-
-  getAugment() {
-    return 'Keycloak object was augmented with: ' + this.augment;
   }
 
   login = (options) => {
@@ -34,6 +30,15 @@ class Phasetwo extends Keycloak {
     console.log('⬅️ Phase Two logging out!');
     return this.super_.logout(options);
   };
+
+  init = (options) => {
+    console.log('🌱 Phase Two init.');
+    return this.super_.init(options);
+  };
+
+  getAugment() {
+    return this.augment;
+  }
 
   getConfig() {
     // return the config object
