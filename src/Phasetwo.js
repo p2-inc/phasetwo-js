@@ -24,12 +24,12 @@ class Phasetwo extends Keycloak {
   }
 
   login = (options) => {
-    console.log('➡️ Phase Two logging in!');
+    console.log('➡️ Phase Two logging in.');
     return this.super_.login(options);
   };
 
   logout = (options) => {
-    console.log('⬅️ Phase Two logging out!');
+    console.log('⬅️ Phase Two logging out.');
     return this.super_.logout(options);
   };
 
@@ -43,7 +43,6 @@ class Phasetwo extends Keycloak {
   }
 
   getConfig() {
-    // return the config object
     return this.config;
   }
 
