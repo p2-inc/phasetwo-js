@@ -16,7 +16,9 @@ class Phasetwo extends Keycloak {
       console.log('🔥 You provided a secret config option. Nice.');
     }
 
-    this.augment = config.augment;
+    if (config && config.augment) {
+      this.augment = config.augment;
+    }
 
     console.log('👌 Built Phasetwo object.');
   }
