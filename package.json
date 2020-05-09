@@ -4,8 +4,8 @@
   "description": "An augmented version of keycloak-js",
   "repository": "https://github.com/somaholiday/phasetwo-js",
   "private": true,
-  "main": "dist/phasetwo-js.cjs",
-  "module": "dist/phasetwo-js.mjs",
+  "main": "dist/phasetwo-js.umd.js",
+  "module": "dist/phasetwo-js.es.js",
   "files": [
     "dist"
   ],
