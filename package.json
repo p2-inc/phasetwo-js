@@ -1,6 +1,6 @@
 {
   "name": "phasetwo-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An augmented version of keycloak-js",
   "repository": "https://github.com/p2-inc/phasetwo-js",
   "private": true,
