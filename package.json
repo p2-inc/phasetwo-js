@@ -2,7 +2,7 @@
   "name": "phasetwo-js",
   "version": "0.1.0",
   "description": "An augmented version of keycloak-js",
-  "repository": "https://github.com/somaholiday/phasetwo-js",
+  "repository": "https://github.com/p2-inc/phasetwo-js",
   "private": true,
   "main": "dist/phasetwo-js.umd.js",
   "module": "dist/phasetwo-js.es.js",
