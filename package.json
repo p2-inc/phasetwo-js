@@ -1,8 +1,11 @@
 {
   "name": "phasetwo-js",
   "version": "0.1.1",
-  "description": "An augmented version of keycloak-js",
-  "repository": "https://github.com/p2-inc/phasetwo-js",
+  "description": "Browser library for identity and access management",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p2-inc/phasetwo-js.git"
+  },
   "private": true,
   "main": "dist/phasetwo-js.umd.js",
   "module": "dist/phasetwo-js.es.js",
@@ -17,8 +20,6 @@
     "test": "jest",
     "test-watch": "npm test -- --watchAll"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "keycloak-js": "^10.0.0"
   },
