@@ -1,5 +1,7 @@
 import Keycloak from 'keycloak-js';
 
+import { Account } from 'phasetwo-api-client';
+
 class Phasetwo extends Keycloak {
   super_ = {
     init: this.init,
@@ -48,6 +50,14 @@ class Phasetwo extends Keycloak {
 
   getClientId() {
     return this.clientId;
+  }
+
+  getRealmUrl() {
+    return `${this.config.url}realms/${this.config.realm}`;
+  }
+
+  accountApi() {
+    return new Account(this.getRealmUrl());
   }
 }
 
