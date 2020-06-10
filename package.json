@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "keycloak-js": "^10.0.0",
-    "phasetwo-api-client": "git://github.com/p2-inc/phasetwo-api-client.git#rollup-config"
+    "phasetwo-api-client": "git://github.com/p2-inc/phasetwo-api-client.git"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
