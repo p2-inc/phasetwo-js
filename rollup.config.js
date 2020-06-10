@@ -4,18 +4,22 @@ import babel from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
 import pkg from './package.json';
 
-export default {
-  input: './src/index.js',
-  output: [
-    {
-      file: pkg.main,
-      format: 'umd', // UMD (AMD / CJS hybrid)
+export default [
+  // browser-friendly UMD build
+  {
+    input: 'src/index.js',
+    output: {
+      file: pkg.browser,
+      format: 'umd',
       name: 'Phasetwo',
     },
-    {
-      file: pkg.module,
-      format: 'es', // ES6 import/export
-    },
-  ],
-  plugins: [resolve(), commonjs(), babel({ babelHelpers: 'bundled' }), json()],
-};
+    plugins: [resolve({ browser: true }), commonjs(), babel({ babelHelpers: 'bundled' }), json()],
+  },
+
+  // ES module (for bundlers) build.
+  {
+    input: 'src/index.js',
+    external: [].concat('keycloak-js', 'phasetwo-api-client'),
+    output: [{ file: pkg.module, format: 'es' }],
+  },
+];
