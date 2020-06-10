@@ -14,6 +14,18 @@ export default [
       name: 'Phasetwo',
     },
     plugins: [resolve({ browser: true }), commonjs(), babel({ babelHelpers: 'bundled' }), filesize()],
+    onwarn: (warning, next) => {
+      // suppress eval warnings
+      const knownModules = ['js-sha256', 'keycloak-js'].map((module) => `node_modules/${module}`);
+      if (warning.code === 'EVAL') {
+        for (const module of knownModules) {
+          if (warning.loc.file.includes(module)) {
+            return;
+          }
+        }
+      }
+      next(warning);
+    },
   },
 
   // ES module (for bundlers) build.
