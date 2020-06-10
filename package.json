@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run clean && rollup -c",
     "clean": "rm -rf dist",
     "prepare": "npm run build",
     "release": "np",
