@@ -1,7 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
-import json from '@rollup/plugin-json';
 import pkg from './package.json';
 
 export default [
@@ -13,7 +12,7 @@ export default [
       format: 'umd',
       name: 'Phasetwo',
     },
-    plugins: [resolve({ browser: true }), commonjs(), babel({ babelHelpers: 'bundled' }), json()],
+    plugins: [resolve({ browser: true }), commonjs(), babel({ babelHelpers: 'bundled' })],
   },
 
   // ES module (for bundlers) build.
