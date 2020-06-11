@@ -4,6 +4,9 @@ import babel from '@rollup/plugin-babel';
 import filesize from 'rollup-plugin-filesize';
 import pkg from './package.json';
 
+// list of dependencies to load from node_modules rather than bundle in phasetwo-js ES bundle
+const externals = ['keycloak-js', 'phasetwo-api-client'];
+
 export default [
   // browser-friendly UMD build
   {
@@ -31,7 +34,7 @@ export default [
   // ES module (for bundlers) build.
   {
     input: 'src/index.js',
-    external: [].concat('keycloak-js', 'phasetwo-api-client'),
+    external: externals,
     output: [{ file: pkg.module, format: 'es' }],
     plugins: [filesize()],
   },
