@@ -84,7 +84,7 @@ If you are using this in a server-side Node.js application, we recommend using a
 - [keycloak-nodejs-admin-client](https://github.com/keycloak/keycloak-nodejs-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
 - [node-openid-client](https://github.com/panva/node-openid-client) A OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js. See their [quickstart](https://github.com/panva/node-openid-client#quick-start) for examples of which flow you are using.
 
-This example uses the Keycloak Node.js Admin library. See their [usage documentation](https://github.com/keycloak/keycloak-nodejs-admin-client#usage) for more informatin on what type of flow you are using:
+This example uses the Keycloak Node.js Admin library. See their [usage documentation](https://github.com/keycloak/keycloak-nodejs-admin-client#usage) for more information on what type of flow you are using (the example is a password grant type):
 ```
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 
@@ -152,6 +152,7 @@ _unPublished (not recommended):_
 
 ```
 npm install PATH_TO_GENERATED_PACKAGE --save
+```
 
 ---
 
