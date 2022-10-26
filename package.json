@@ -1,11 +1,11 @@
 {
-  "name": "p2-inc/js-sdk",
+  "name": "@p2-inc/js-sdk",
   "version": "0.0.1",
-  "description": "OpenAPI client for p2-inc/js-sdk",
+  "description": "Phase Two API JavaScript SDK",
   "author": "OpenAPI-Generator",
   "repository": {
     "type": "git",
-    "url": "https://github.com/p2-inc/phasetwo.js.git"
+    "url": "git+https://github.com/p2-inc/phasetwo.js.git"
   },
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
@@ -17,5 +17,15 @@
   },
   "devDependencies": {
     "typescript": "^4.0"
-  }
+  },
+  "keywords": [
+    "phasetwo",
+    "keycloak"
+  ],
+  "author": "p2-inc",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/p2-inc/phasetwo-js/issues"
+  },
+  "homepage": "https://github.com/p2-inc/phasetwo-js#readme"
 }

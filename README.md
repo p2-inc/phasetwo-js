@@ -145,7 +145,7 @@ navigate to the folder of your consuming project and run one of the following co
 _published:_
 
 ```
-npm install p2-inc/js-sdk@6.9.0 --save
+npm install p2-inc/js-sdk@VERSION --save
 ```
 
 _unPublished (not recommended):_
