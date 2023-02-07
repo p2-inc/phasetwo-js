@@ -1,11 +1,11 @@
 {
   "name": "@p2-inc/js-sdk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Phase Two API JavaScript SDK",
   "author": "OpenAPI-Generator",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/p2-inc/phasetwo.js.git"
+    "url": "git+https://github.com/p2-inc/phasetwo-js.git"
   },
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
