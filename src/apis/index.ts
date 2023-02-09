@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AccountApi';
 export * from './AttributesApi';
 export * from './EventsApi';
 export * from './IdentityProvidersApi';
