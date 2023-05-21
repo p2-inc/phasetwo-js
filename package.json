@@ -1,8 +1,8 @@
 {
   "name": "@p2-inc/js-sdk",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Phase Two API JavaScript SDK",
-  "author": "OpenAPI-Generator",
+  "author": "p2-inc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/p2-inc/phasetwo-js.git"
@@ -22,7 +22,6 @@
     "phasetwo",
     "keycloak"
   ],
-  "author": "p2-inc",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/p2-inc/phasetwo-js/issues"
