@@ -37,8 +37,14 @@ export interface CheckOrganizationMembershipRequest {
 export interface GetOrganizationMembershipsRequest {
     realm: string;
     orgId: string;
+    search?: string;
     first?: number;
     max?: number;
+}
+
+export interface GetOrganizationMembershipsCountRequest {
+    realm: string;
+    orgId: string;
 }
 
 export interface RemoveOrganizationMemberRequest {
@@ -159,6 +165,10 @@ export class OrganizationMembershipsApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.search !== undefined) {
+            queryParameters['search'] = requestParameters.search;
+        }
+
         if (requestParameters.first !== undefined) {
             queryParameters['first'] = requestParameters.first;
         }
@@ -193,6 +203,50 @@ export class OrganizationMembershipsApi extends runtime.BaseAPI {
      */
     async getOrganizationMemberships(requestParameters: GetOrganizationMembershipsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserRepresentation>> {
         const response = await this.getOrganizationMembershipsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get total number of members of a given organization
+     * Get organization members count
+     */
+    async getOrganizationMembershipsCountRaw(requestParameters: GetOrganizationMembershipsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        if (requestParameters.realm === null || requestParameters.realm === undefined) {
+            throw new runtime.RequiredError('realm','Required parameter requestParameters.realm was null or undefined when calling getOrganizationMembershipsCount.');
+        }
+
+        if (requestParameters.orgId === null || requestParameters.orgId === undefined) {
+            throw new runtime.RequiredError('orgId','Required parameter requestParameters.orgId was null or undefined when calling getOrganizationMembershipsCount.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("access_token", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/{realm}/orgs/{orgId}/members/count`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))).replace(`{${"orgId"}}`, encodeURIComponent(String(requestParameters.orgId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Get total number of members of a given organization
+     * Get organization members count
+     */
+    async getOrganizationMembershipsCount(requestParameters: GetOrganizationMembershipsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.getOrganizationMembershipsCountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

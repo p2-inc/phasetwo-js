@@ -400,7 +400,7 @@ export class AccountApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/{realm}/account`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
+            path: `/{realm}/account/`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -739,7 +739,7 @@ export class AccountApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/{realm}/account`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
+            path: `/{realm}/account/`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

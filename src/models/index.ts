@@ -27,3 +27,4 @@ export * from './SessionRepresentation';
 export * from './UserCredentialMetadataRepresentation';
 export * from './UserProfileMetadataAttributeRepresentation';
 export * from './UserProfileMetadataRepresentation';
+export * from './MyOrganizationRepresentation';

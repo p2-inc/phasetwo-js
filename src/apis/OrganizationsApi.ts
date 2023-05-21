@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  MyOrganizationRepresentation,
   OrganizationRepresentation,
   PortalLinkRepresentation,
 } from '../models';
 import {
+    MyOrganizationRepresentationFromJSON,
+    MyOrganizationRepresentationToJSON,
     OrganizationRepresentationFromJSON,
     OrganizationRepresentationToJSON,
     PortalLinkRepresentationFromJSON,
@@ -41,6 +44,10 @@ export interface DeleteOrganizationRequest {
     orgId: string;
 }
 
+export interface GetMeRequest {
+    realm: string;
+}
+
 export interface GetOrganizationByIdRequest {
     realm: string;
     orgId: string;
@@ -51,6 +58,11 @@ export interface GetOrganizationsRequest {
     search?: string;
     first?: number;
     max?: number;
+}
+
+export interface GetOrganizationsCountRequest {
+    realm: string;
+    search?: string;
 }
 
 export interface UpdateOrganizationRequest {
@@ -213,6 +225,46 @@ export class OrganizationsApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get a list of all organizations that the user is a member and their roles in those organizations. Similar idea to /userinfo in OIDC.
+     * Get orgs and roles for authenticated user
+     */
+    async getMeRaw(requestParameters: GetMeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: MyOrganizationRepresentation; }>> {
+        if (requestParameters.realm === null || requestParameters.realm === undefined) {
+            throw new runtime.RequiredError('realm','Required parameter requestParameters.realm was null or undefined when calling getMe.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("access_token", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/{realm}/orgs/me`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => runtime.mapValues(jsonValue, MyOrganizationRepresentationFromJSON));
+    }
+
+    /**
+     * Get a list of all organizations that the user is a member and their roles in those organizations. Similar idea to /userinfo in OIDC.
+     * Get orgs and roles for authenticated user
+     */
+    async getMe(requestParameters: GetMeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: MyOrganizationRepresentation; }> {
+        const response = await this.getMeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get organization by id
      */
     async getOrganizationByIdRaw(requestParameters: GetOrganizationByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OrganizationRepresentation>> {
@@ -303,6 +355,50 @@ export class OrganizationsApi extends runtime.BaseAPI {
      */
     async getOrganizations(requestParameters: GetOrganizationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OrganizationRepresentation>> {
         const response = await this.getOrganizationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get a count of organizations using an optional search query.
+     * Get organizations count
+     */
+    async getOrganizationsCountRaw(requestParameters: GetOrganizationsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        if (requestParameters.realm === null || requestParameters.realm === undefined) {
+            throw new runtime.RequiredError('realm','Required parameter requestParameters.realm was null or undefined when calling getOrganizationsCount.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.search !== undefined) {
+            queryParameters['search'] = requestParameters.search;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("access_token", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/{realm}/orgs/count`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Get a count of organizations using an optional search query.
+     * Get organizations count
+     */
+    async getOrganizationsCount(requestParameters: GetOrganizationsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.getOrganizationsCountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
