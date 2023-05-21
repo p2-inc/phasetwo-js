@@ -53,6 +53,11 @@ export interface GetOrganizationsRequest {
     max?: number;
 }
 
+export interface GetOrganizationsCountRequest {
+    realm: string;
+    search?: string;
+}
+
 export interface UpdateOrganizationRequest {
     realm: string;
     orgId: string;
@@ -303,6 +308,50 @@ export class OrganizationsApi extends runtime.BaseAPI {
      */
     async getOrganizations(requestParameters: GetOrganizationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OrganizationRepresentation>> {
         const response = await this.getOrganizationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get organizations count using an optional search query.
+     * Get organizations count
+     */
+    async getOrganizationsCountRaw(requestParameters: GetOrganizationsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Number>> {
+        if (requestParameters.realm === null || requestParameters.realm === undefined) {
+            throw new runtime.RequiredError('realm','Required parameter requestParameters.realm was null or undefined when calling getOrganizations.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.search !== undefined) {
+            queryParameters['search'] = requestParameters.search;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("access_token", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/{realm}/orgs/count`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => parseInt(jsonValue));
+    }
+
+    /**
+     * Get organizations count using an optional search query.
+     * Get organizations count
+     */
+    async getOrganizationsCount(requestParameters: GetOrganizationsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Number> {
+        const response = await this.getOrganizationsCountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
