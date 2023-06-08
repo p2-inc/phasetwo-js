@@ -66,11 +66,6 @@ export interface GetOrganizationsCountRequest {
     search?: string;
 }
 
-export interface RealmUsersUserIdOrgsGetRequest {
-    realm: string;
-    userId: string;
-}
-
 export interface UpdateOrganizationRequest {
     realm: string;
     orgId: string;
@@ -409,48 +404,6 @@ export class OrganizationsApi extends runtime.BaseAPI {
      */
     async getOrganizationsCount(requestParameters: GetOrganizationsCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.getOrganizationsCountRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * List organizations for the given user
-     */
-    async realmUsersUserIdOrgsGetRaw(requestParameters: RealmUsersUserIdOrgsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OrganizationRepresentation>>> {
-        if (requestParameters.realm === null || requestParameters.realm === undefined) {
-            throw new runtime.RequiredError('realm','Required parameter requestParameters.realm was null or undefined when calling realmUsersUserIdOrgsGet.');
-        }
-
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling realmUsersUserIdOrgsGet.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("access_token", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/{realm}/users/{userId}/orgs`.replace(`{${"realm"}}`, encodeURIComponent(String(requestParameters.realm))).replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters.userId))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OrganizationRepresentationFromJSON));
-    }
-
-    /**
-     * List organizations for the given user
-     */
-    async realmUsersUserIdOrgsGet(requestParameters: RealmUsersUserIdOrgsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OrganizationRepresentation>> {
-        const response = await this.realmUsersUserIdOrgsGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
