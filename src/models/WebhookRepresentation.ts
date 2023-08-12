@@ -99,10 +99,10 @@ export function WebhookRepresentationFromJSONTyped(json: any, ignoreDiscriminato
         'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'url': !exists(json, 'url') ? undefined : json['url'],
         'secret': !exists(json, 'secret') ? undefined : json['secret'],
-        'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
-        'createdAt': !exists(json, 'created_at') ? undefined : json['created_at'],
+        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
+        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
         'realm': !exists(json, 'realm') ? undefined : json['realm'],
-        'eventTypes': !exists(json, 'event_types') ? undefined : json['event_types'],
+        'eventTypes': !exists(json, 'eventTypes') ? undefined : json['eventTypes'],
     };
 }
 
@@ -120,10 +120,10 @@ export function WebhookRepresentationToJSON(value?: WebhookRepresentation | null
         'enabled': value.enabled,
         'url': value.url,
         'secret': value.secret,
-        'created_by': value.createdBy,
-        'created_at': value.createdAt,
+        'createdBy': value.createdBy,
+        'createdAt': value.createdAt,
         'realm': value.realm,
-        'event_types': value.eventTypes,
+        'eventTypes': value.eventTypes,
     };
 }
 
