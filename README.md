@@ -1,3 +1,5 @@
+> :rocket: **Try it for free** in the new Phase Two [keycloak hosting](https://phasetwo.io/?utm_medium=readme&utm_campaign=phasetwo-js) service. Go to [Phase Two](https://phasetwo.io/) for more information.
+
 > :bug: **This is alpha software**
 
 # JavaScript SDK for Phase Two API
