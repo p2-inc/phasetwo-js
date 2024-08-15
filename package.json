@@ -1,6 +1,6 @@
 {
   "name": "@p2-inc/js-sdk",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Phase Two API JavaScript SDK",
   "author": "p2-inc",
   "repository": {
@@ -26,5 +26,5 @@
   "bugs": {
     "url": "https://github.com/p2-inc/phasetwo-js/issues"
   },
-  "homepage": "https://github.com/p2-inc/phasetwo-js#readme"
+  "homepage": "https://phasetwo.io/docs/introduction/"
 }
