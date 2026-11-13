@@ -24,11 +24,37 @@ jobs:
       - name: Import check
         run: node -e 'const sdk = require("./"); if (!sdk.OrganizationsApi) process.exit(1)'
 
+  # Runs the README quick start (examples/quickstart.ts) against Phase Two Keycloak.
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Start Phase Two Keycloak
+        run: |
+          docker run -d --name keycloak -p 8080:8080 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HTTP_RELATIVE_PATH=/auth \
+            quay.io/phasetwo/phasetwo-keycloak:26.5.6 start-dev
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      # Examples import the package by name; point that at this checkout.
+      - run: mkdir -p node_modules/@p2-inc && ln -s ../.. node_modules/@p2-inc/js-sdk
+      - run: npx tsc -p examples
+      - name: Wait for Keycloak
+        run: timeout 180 bash -c 'until curl -fs http://localhost:8080/auth/realms/master >/dev/null; do sleep 3; done'
+      - run: examples/setup.sh http://localhost:8080/auth >> "$GITHUB_ENV"
+      - run: node examples/quickstart.ts
+      - if: failure()
+        run: docker logs keycloak | tail -100
+
   # One stable check name for branch protection, whatever the matrix above holds.
   # Add new jobs to needs.
   ci-ok:
     if: always()
-    needs: [build]
+    needs: [build, examples]
     runs-on: ubuntu-latest
     steps:
       - run: |
