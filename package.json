@@ -1,6 +1,6 @@
 {
   "name": "@p2-inc/js-sdk",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "Phase Two API JavaScript SDK",
   "author": "p2-inc",
   "repository": {
@@ -16,7 +16,7 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "typescript": "^4.0"
+    "typescript": "^5.9"
   },
   "keywords": [
     "phasetwo",

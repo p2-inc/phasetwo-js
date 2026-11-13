@@ -40,8 +40,7 @@ The JavaScript SDK assumes the use of the offical keycloak-js library for browse
 ### Examples
 
 ```typescript
-import { Configuration } from ".";
-import { EventsApi, OrganizationsApi } from "./apis";
+import { Configuration, EventsApi, OrganizationsApi } from "@p2-inc/js-sdk";
 
 // Configure the API connection
 const configuration = new Configuration({
@@ -70,7 +69,7 @@ const events = new EventsApi(configuration);
 events.createEvent({realm: realm,
   eventRepresentation: {
     type: 'foo.bar',
-    organizationId: orgId,
+    representation: JSON.stringify({ orgId }),
     time: Date.now(),
   }
 });
@@ -124,53 +123,15 @@ const configuration = new Configuration({
 });
 ```
 
-## Developers
+## Generated code
 
-The sources are generated using the [OpenAPI typescript-fetch](https://openapi-generator.tech/docs/generators/typescript-fetch) generator. 
+The API classes and models in `src/openapi` are generated from the [Phase Two OpenAPI spec](https://github.com/p2-inc/phasetwo-docs/blob/main/openapi.yaml) by [phasetwo-sdk-generator](https://github.com/p2-inc/phasetwo-sdk-generator) (generator: [typescript-fetch](https://openapi-generator.tech/docs/generators/typescript-fetch)). Don't edit them by hand; `sdk-generator.json` records the spec commit they came from. `src/index.ts` is hand-written.
 
-The generator creates TypeScript/JavaScript client that utilizes [Fetch API](https://fetch.spec.whatwg.org/). The generated Node module can be used in the following environments:
+To build:
 
-### Environment
-* Node.js
-* Webpack
-* Browserify
-
-### Language level
-* ES5 - you must have a Promises/A+ library installed
-* ES6
-
-### Module system
-* CommonJS
-* ES6 module system
-
-It can be used in both TypeScript and JavaScript. In TypeScript, the definition should be automatically resolved via `package.json`. ([Reference](http://www.typescriptlang.org/docs/handbook/typings-for-npm-packages.html))
-
-### Building
-
-To build and compile the typescript sources to javascript use:
 ```
 npm install
 npm run build
-```
-
-### Publishing
-
-First build the package then run ```npm publish```
-
-### Consuming
-
-navigate to the folder of your consuming project and run one of the following commands.
-
-_published:_
-
-```
-npm install p2-inc/js-sdk@VERSION --save
-```
-
-_unPublished (not recommended):_
-
-```
-npm install PATH_TO_GENERATED_PACKAGE --save
 ```
 
 ---
