@@ -1,8 +1,9 @@
-# On each merge to main, publish the next version of @p2-inc/js-sdk to npm: a minor
-# bump if the merged PR is labelled semver:minor (phasetwo-sdk-generator sets it for
-# breaking spec changes), otherwise a patch bump of the version currently on npm. The
-# version is set at publish time and the release is tagged vX.Y.Z; package.json's
-# version in git isn't updated. Skip with [ci skip] in the commit message.
+# On each merge to main, publish the next version of @p2-inc/js-sdk to npm.
+# Versions follow the API version in sdk-generator.json (the spec's info.version),
+# shared by all Phase Two SDKs: the first release for API X.Y is X.Y.0, and later
+# releases (e.g. SDK-only fixes) are X.Y.1, X.Y.2, ... based on this repo's tags.
+# The version is set at publish time and tagged vX.Y.Z; package.json's version in
+# git isn't updated. Skip with [ci skip] in the commit message.
 #
 # Uses npm trusted publishing (OIDC): configure it on npmjs.com for this repo and
 # workflow file. No NPM_TOKEN needed.
@@ -19,7 +20,6 @@ concurrency:
 permissions:
   contents: write
   id-token: write
-  pull-requests: read
 
 jobs:
   release:
@@ -27,23 +27,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
           registry-url: https://registry.npmjs.org
       - name: Choose version
         id: version
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          current=$(npm view "$(node -p 'require("./package.json").name')" version 2>/dev/null || echo 0.0.0)
-          IFS=. read -r major minor patch <<< "$current"
-          labels=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '.[0].labels[].name' 2>/dev/null || true)
-          if grep -qx 'semver:minor' <<< "$labels"; then
-            next="$major.$((minor + 1)).0"
-          else
-            next="$major.$minor.$((patch + 1))"
-          fi
+          api=$(sed -n 's/.*"apiVersion": *"\([^"]*\)".*/\1/p' sdk-generator.json)
+          [ -n "$api" ] || { echo "::error::no apiVersion in sdk-generator.json"; exit 1; }
+          mm=${api%.*}
+          last=$(git tag --list "v$mm.*" --sort=-v:refname | head -1)
+          if [ -z "$last" ]; then next="$mm.0"; else next="$mm.$(( ${last##*.} + 1 ))"; fi
           echo "next=$next" >> "$GITHUB_OUTPUT"
       - run: npm ci --no-audit --no-fund
       - run: npm version "${{ steps.version.outputs.next }}" --no-git-tag-version
