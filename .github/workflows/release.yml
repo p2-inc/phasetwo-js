@@ -43,7 +43,7 @@ jobs:
           if [ -z "$last" ]; then next="$mm.0"; else next="$mm.$(( ${last##*.} + 1 ))"; fi
           echo "next=$next" >> "$GITHUB_OUTPUT"
       - run: npm ci --no-audit --no-fund
-      - run: npm version "${{ steps.version.outputs.next }}" --no-git-tag-version
+      - run: npm version "${{ steps.version.outputs.next }}" --no-git-tag-version --allow-same-version
       - run: npm run build
       - run: npm publish --provenance --access public
       - name: Tag and GitHub release
