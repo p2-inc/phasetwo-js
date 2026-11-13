@@ -23,3 +23,13 @@ jobs:
       - run: npm run build
       - name: Import check
         run: node -e 'const sdk = require("./"); if (!sdk.OrganizationsApi) process.exit(1)'
+
+  # One stable check name for branch protection, whatever the matrix above holds.
+  # Add new jobs to needs.
+  ci-ok:
+    if: always()
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}" = false ]
