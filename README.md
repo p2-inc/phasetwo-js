@@ -1,6 +1,4 @@
-> :bug: **This is alpha software**
-
-# JavaScript SDK for Phase Two API
+# Phase Two TypeScript SDK
 
 <!-- phasetwo:banner:start - managed by p2-inc/shared-github-actions, edit there -->
 [![npm](https://img.shields.io/npm/v/@p2-inc/js-sdk)](https://www.npmjs.com/package/@p2-inc/js-sdk) [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](COPYING) [![docs](https://img.shields.io/badge/docs-phasetwo.io-blue)](https://phasetwo.io/docs/api/sdks/)
@@ -22,6 +20,9 @@
 <!-- phasetwo:banner:end -->
 
 The Phase Two JavaScript SDK library provides access to the Phase Two API for Node.js and browser applications.
+
+> [!NOTE]
+> Pre-1.0: minor versions can contain breaking changes, which come from changes to the API spec. Pin a version.
 
 ## Documentation
 
@@ -99,19 +100,18 @@ const configuration = new Configuration({
 #### Node.js
 
 If you are using this in a server-side Node.js application, we recommend using an OpenID Connect library such as:
-- [keycloak-nodejs-admin-client](https://github.com/keycloak/keycloak-nodejs-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
-- [node-openid-client](https://github.com/panva/node-openid-client) A OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js. See their [quickstart](https://github.com/panva/node-openid-client#quick-start) for examples of which flow you are using.
+- [@keycloak/keycloak-admin-client](https://www.npmjs.com/package/@keycloak/keycloak-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
+- [openid-client](https://github.com/panva/openid-client) An OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.
 
-This example uses the Keycloak Node.js Admin library. See their [usage documentation](https://github.com/keycloak/keycloak-nodejs-admin-client#usage) for more information on what type of flow you are using (the example is a password grant type):
+This example uses the Keycloak Node.js Admin library with the client credentials grant, for a confidential client with a [service account](https://phasetwo.io/docs/api/service-accounts):
 ```
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 
 const kcAdminClient = new KcAdminClient();
 await kcAdminClient.auth({
-  clientId: 'admin',
-  password: 'admin',
-  grantType: 'password',
-  clientId: 'admin-cli',
+  grantType: 'client_credentials',
+  clientId: 'api-client',
+  clientSecret: process.env.PHASETWO_CLIENT_SECRET,
 });
 
 const getAccessToken = () => kcAdminClient.getAccessToken();
@@ -134,6 +134,6 @@ npm install
 npm run build
 ```
 
----
+## License
 
-All documentation, source code and other files in this repository are Copyright 2022 Phase Two, Inc.
+Apache License 2.0, see [COPYING](COPYING).
