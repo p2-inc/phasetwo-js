@@ -1,6 +1,4 @@
-> :bug: **This is alpha software**
-
-# JavaScript SDK for Phase Two API
+# Phase Two TypeScript SDK
 
 <!-- phasetwo:banner:start - managed by p2-inc/shared-github-actions, edit there -->
 [![npm](https://img.shields.io/npm/v/@p2-inc/js-sdk)](https://www.npmjs.com/package/@p2-inc/js-sdk) [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](COPYING) [![docs](https://img.shields.io/badge/docs-phasetwo.io-blue)](https://phasetwo.io/docs/api/sdks/)
@@ -23,6 +21,9 @@
 
 The Phase Two JavaScript SDK library provides access to the Phase Two API for Node.js and browser applications.
 
+> [!NOTE]
+> All Phase Two SDKs (Java, TypeScript, Python, Go) share the version of the Phase Two API they implement: every SDK release X.Y.* implements API X.Y, and patch releases are SDK-only fixes. While on 0.x, a new minor version can contain breaking changes from the API spec, so pin a version.
+
 ## Documentation
 
 See the [API Reference](https://phasetwo.io/api/) and [NPM page](https://www.npmjs.com/package/@p2-inc/js-sdk).
@@ -40,8 +41,7 @@ The JavaScript SDK assumes the use of the offical keycloak-js library for browse
 ### Examples
 
 ```typescript
-import { Configuration } from ".";
-import { EventsApi, OrganizationsApi } from "./apis";
+import { Configuration, EventsApi, OrganizationsApi } from "@p2-inc/js-sdk";
 
 // Configure the API connection
 const configuration = new Configuration({
@@ -70,7 +70,7 @@ const events = new EventsApi(configuration);
 events.createEvent({realm: realm,
   eventRepresentation: {
     type: 'foo.bar',
-    organizationId: orgId,
+    representation: JSON.stringify({ orgId }),
     time: Date.now(),
   }
 });
@@ -100,19 +100,18 @@ const configuration = new Configuration({
 #### Node.js
 
 If you are using this in a server-side Node.js application, we recommend using an OpenID Connect library such as:
-- [keycloak-nodejs-admin-client](https://github.com/keycloak/keycloak-nodejs-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
-- [node-openid-client](https://github.com/panva/node-openid-client) A OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js. See their [quickstart](https://github.com/panva/node-openid-client#quick-start) for examples of which flow you are using.
+- [@keycloak/keycloak-admin-client](https://www.npmjs.com/package/@keycloak/keycloak-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
+- [openid-client](https://github.com/panva/openid-client) An OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.
 
-This example uses the Keycloak Node.js Admin library. See their [usage documentation](https://github.com/keycloak/keycloak-nodejs-admin-client#usage) for more information on what type of flow you are using (the example is a password grant type):
+This example uses the Keycloak Node.js Admin library with the client credentials grant, for a confidential client with a [service account](https://phasetwo.io/docs/api/service-accounts):
 ```
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 
 const kcAdminClient = new KcAdminClient();
 await kcAdminClient.auth({
-  clientId: 'admin',
-  password: 'admin',
-  grantType: 'password',
-  clientId: 'admin-cli',
+  grantType: 'client_credentials',
+  clientId: 'api-client',
+  clientSecret: process.env.PHASETWO_CLIENT_SECRET,
 });
 
 const getAccessToken = () => kcAdminClient.getAccessToken();
@@ -124,55 +123,17 @@ const configuration = new Configuration({
 });
 ```
 
-## Developers
+## Generated code
 
-The sources are generated using the [OpenAPI typescript-fetch](https://openapi-generator.tech/docs/generators/typescript-fetch) generator. 
+The API classes and models in `src/openapi` are generated from the [Phase Two OpenAPI spec](https://github.com/p2-inc/phasetwo-docs/blob/main/openapi.yaml) by [phasetwo-sdk-generator](https://github.com/p2-inc/phasetwo-sdk-generator) (generator: [typescript-fetch](https://openapi-generator.tech/docs/generators/typescript-fetch)). Don't edit them by hand; `sdk-generator.json` records the spec commit they came from. `src/index.ts` is hand-written.
 
-The generator creates TypeScript/JavaScript client that utilizes [Fetch API](https://fetch.spec.whatwg.org/). The generated Node module can be used in the following environments:
+To build:
 
-### Environment
-* Node.js
-* Webpack
-* Browserify
-
-### Language level
-* ES5 - you must have a Promises/A+ library installed
-* ES6
-
-### Module system
-* CommonJS
-* ES6 module system
-
-It can be used in both TypeScript and JavaScript. In TypeScript, the definition should be automatically resolved via `package.json`. ([Reference](http://www.typescriptlang.org/docs/handbook/typings-for-npm-packages.html))
-
-### Building
-
-To build and compile the typescript sources to javascript use:
 ```
 npm install
 npm run build
 ```
 
-### Publishing
+## License
 
-First build the package then run ```npm publish```
-
-### Consuming
-
-navigate to the folder of your consuming project and run one of the following commands.
-
-_published:_
-
-```
-npm install p2-inc/js-sdk@VERSION --save
-```
-
-_unPublished (not recommended):_
-
-```
-npm install PATH_TO_GENERATED_PACKAGE --save
-```
-
----
-
-All documentation, source code and other files in this repository are Copyright 2022 Phase Two, Inc.
+Apache License 2.0, see [COPYING](COPYING).
