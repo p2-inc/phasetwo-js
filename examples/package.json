@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Examples for @p2-inc/js-sdk, run by CI against the package built from this repo"
+}
