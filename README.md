@@ -19,120 +19,157 @@
 > ```
 <!-- phasetwo:banner:end -->
 
-The Phase Two JavaScript SDK library provides access to the Phase Two API for Node.js and browser applications.
+A TypeScript/JavaScript client for the [Phase Two](https://phasetwo.io) Admin API, for Node.js and browsers. It covers what Phase Two adds to Keycloak: organizations, members, roles, domains, identity providers, invitations, SCIM, webhooks and events, realm attributes and magic links. For core Keycloak administration (realms, clients, users), use the official [Keycloak admin client](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client) alongside it. See the [API reference](https://phasetwo.io/api/) for every operation.
 
 > [!NOTE]
-> All Phase Two SDKs (Java, TypeScript, Python, Go) share the version of the Phase Two API they implement: every SDK release X.Y.* implements API X.Y, and patch releases are SDK-only fixes. While on 0.x, a new minor version can contain breaking changes from the API spec, so pin a version.
-
-## Documentation
-
-See the [API Reference](https://phasetwo.io/api/) and [NPM page](https://www.npmjs.com/package/@p2-inc/js-sdk).
+> Pre-1.0: minor versions can include breaking changes. All Phase Two SDKs share a version: release X.Y.* implements Phase Two API X.Y.
 
 ## Installation
 
+```sh
+npm install @p2-inc/js-sdk
 ```
-npm i @p2-inc/js-sdk
-```
 
-## Use
+The package ships CommonJS (`dist/`) and ES module (`dist/esm/`) builds with type definitions. It uses the global `fetch`, so it needs Node.js 20 or later (CI tests 20, 22 and 24) or any modern browser.
 
-The JavaScript SDK assumes the use of the offical keycloak-js library for browser use, or a OpenID Connect library for Node.js use. See the [Authentication](#Authentication) notes below for example configurations for each.
+## Quick start
 
-### Examples
+Create an organization, add a member, get an IdP Wizard link for the organization's admins, and send an audit event. CI runs this code ([`examples/quickstart.ts`](examples/quickstart.ts)) against Phase Two Keycloak.
 
-```typescript
-import { Configuration, EventsApi, OrganizationsApi } from "@p2-inc/js-sdk";
+<!-- phasetwo:snippet quickstart examples/quickstart.ts -->
+```ts
+import {
+  Configuration,
+  EventsApi,
+  OrganizationMembershipsApi,
+  OrganizationsApi,
+} from "@p2-inc/js-sdk";
 
-// Configure the API connection
-const configuration = new Configuration({
-  basePath: 'https://my-keycloak-host/auth/realms',
-  accessToken: getAccessToken(), //see examples below
+const baseUrl = process.env.PHASETWO_URL!; // e.g. https://euc1.auth.ac/auth
+const realm = process.env.PHASETWO_REALM!;
+
+// A token for a service account, using the client credentials grant.
+async function getAccessToken(): Promise<string> {
+  const response = await fetch(`${baseUrl}/realms/${realm}/protocol/openid-connect/token`, {
+    method: "POST",
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: process.env.PHASETWO_CLIENT_ID!,
+      client_secret: process.env.PHASETWO_CLIENT_SECRET!,
+    }),
+  });
+  if (!response.ok) throw new Error(`token request failed: ${response.status}`);
+  return (await response.json()).access_token;
+}
+
+const config = new Configuration({
+  basePath: `${baseUrl}/realms`,
+  accessToken: getAccessToken, // called before each request
+});
+const orgs = new OrganizationsApi(config);
+
+// Create an organization. The response has no body; the new id is in Location.
+const created = await orgs.createOrganizationRaw({
+  realm,
+  organizationRepresentation: { name: "acme", domains: ["acme.example"] },
+});
+const orgId = created.raw.headers.get("Location")!.split("/").pop()!;
+
+// Add an existing user as a member.
+await new OrganizationMembershipsApi(config).addOrganizationMember({
+  realm,
+  orgId,
+  userId: process.env.PHASETWO_USER_ID!, // an existing user,
 });
 
-const realm = 'my-realm';
-const orgs = new OrganizationsApi(configuration);
+// A link to the IdP Wizard / Admin Portal for the organization's admins.
+const { link } = await orgs.createPortalLink({ realm, orgId });
+console.log(`portal link: ${link}`);
 
-// Create an Organization
-const createPromise = orgs.createOrganizationRaw({realm: realm, organizationRepresentation: {name: 'my-org'}});
-const orgId = await createPromise.then((resp) => {
-  const uri = resp.raw.headers.get("Location");
-  return uri.substring(uri.lastIndexOf('/') + 1);
-});
-
-// Create an Admin Portal link for the Organization
-const portalLinkPromise = orgs.createPortalLink({realm: realm, orgId: orgId});
-const portalLink = await portalLinkPromise.then((resp) => {
-  return resp.link;
-});
-
-// Create and publish an Audit Event
-const events = new EventsApi(configuration);
-events.createEvent({realm: realm,
+// Send an audit event.
+await new EventsApi(config).createEvent({
+  realm,
   eventRepresentation: {
-    type: 'foo.bar',
-    representation: JSON.stringify({ orgId }),
+    type: "acme.order.created",
+    representation: JSON.stringify({ orgId, order: 42 }),
     time: Date.now(),
+  },
+});
+```
+<!-- /phasetwo:snippet -->
+
+## Authentication
+
+Every call needs an access token from the realm you manage. `accessToken` in `Configuration` takes a string or a function that returns one (or a promise of one), and is called before each request.
+
+- **Server side (recommended):** create a confidential client with a [service account](https://phasetwo.io/docs/api/service-accounts) and give the service account the roles it needs (e.g. `realm-management` → `manage-organizations`). Get tokens with the client credentials grant, as in the quick start. To cache and refresh tokens, use an OpenID Connect library such as [openid-client](https://github.com/panva/openid-client), or the official [Keycloak admin client](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client) if you use it anyway:
+
+  ```ts
+  import KcAdminClient from "@keycloak/keycloak-admin-client";
+
+  const kc = new KcAdminClient({ baseUrl, realmName: realm });
+  await kc.auth({ grantType: "client_credentials", clientId, clientSecret });
+  const config = new Configuration({ basePath: `${baseUrl}/realms`, accessToken: () => kc.getAccessToken() });
+  ```
+
+- **Browser:** with [keycloak-js](https://www.npmjs.com/package/keycloak-js), pass the signed-in user's token. The user needs the organization roles for the calls you make.
+
+  ```ts
+  const config = new Configuration({
+    basePath: `${baseUrl}/realms`,
+    accessToken: async () => {
+      await keycloak.updateToken(30);
+      return keycloak.token!;
+    },
+  });
+  ```
+
+## Usage
+
+- There's one class per API area (`OrganizationsApi`, `OrganizationMembershipsApi`, `IdentityProvidersApi`, `EventsApi`, ...). Each takes a `Configuration`.
+- Method names are the spec's `operationId`s (`createOrganization`, `getOrganizations`, ...). Each takes one object with the path, query and body parameters, starting with `realm`. Its type is `<Class><Method>Request`, e.g. `OrganizationsApiCreateOrganizationRequest`.
+- Optional query parameters, like `first`, `max` and `search`, are optional properties.
+- Every method has a `...Raw` variant that returns the `Response` as well. Creates return `201` with an empty body and the new resource's URL in `Location`: use `createOrganizationRaw` and read `raw.headers.get("Location")`.
+- `basePath` is your server URL plus `/realms`, e.g. `https://euc1.auth.ac/auth/realms`.
+
+### Errors
+
+A non-2xx response throws a `ResponseError` whose `response` is the `fetch` `Response`. A network failure throws a `FetchError`.
+
+```ts
+import { ResponseError } from "@p2-inc/js-sdk";
+
+try {
+  await orgs.getOrganizationById({ realm, orgId });
+} catch (e) {
+  if (e instanceof ResponseError && e.response.status === 404) {
+    // no such organization
+  } else {
+    throw e;
   }
-});
+}
 ```
 
-### Authentication
+## Compatibility
 
-#### Browser
+| SDK | Phase Two API | Tested against |
+|---|---|---|
+| 0.2.x | 0.2 (`apiVersion` in [`sdk-generator.json`](sdk-generator.json)) | `quay.io/phasetwo/phasetwo-keycloak:26.5.6` |
 
-If you are using this in a browser with the official [keycloak-js](https://www.npmjs.com/package/keycloak-js) library, you can configure the Phase Two SDK using the access token from the `Keycloak` instance:
+`sdk-generator.json` also records the commit of the [OpenAPI spec](https://github.com/p2-inc/phasetwo-docs/blob/main/openapi.yaml) the code was generated from.
 
-```
-import { Keycloak } from "keycloak-js";
+**Upgrading from 0.0.x:** the Account API (`AccountApi`) was removed, request types are named after their class (`CreateOrganizationRequest` → `OrganizationsApiCreateOrganizationRequest`), and SCIM operations moved to `OrganizationSCIMApi`.
 
-const keycloak = new Keycloak({ url: 'https://my-keycloak-host/auth/', realm: 'my-realm', clientId: 'my-app' });
-// do your setup and login
+## API reference
 
-const getAccessToken = () => keycloak.token;
-
-// Configure the API connection
-const configuration = new Configuration({
-  basePath: 'https://my-keycloak-host/auth/realms',
-  accessToken: getAccessToken,
-});
-```
-
-#### Node.js
-
-If you are using this in a server-side Node.js application, we recommend using an OpenID Connect library such as:
-- [@keycloak/keycloak-admin-client](https://www.npmjs.com/package/@keycloak/keycloak-admin-client) The official Keycloak Node.js Admin library. Chances are, you will also be using this with the Phase Two SDK to manage Keycloak-native resources.
-- [openid-client](https://github.com/panva/openid-client) An OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.
-
-This example uses the Keycloak Node.js Admin library with the client credentials grant, for a confidential client with a [service account](https://phasetwo.io/docs/api/service-accounts):
-```
-import KcAdminClient from '@keycloak/keycloak-admin-client';
-
-const kcAdminClient = new KcAdminClient();
-await kcAdminClient.auth({
-  grantType: 'client_credentials',
-  clientId: 'api-client',
-  clientSecret: process.env.PHASETWO_CLIENT_SECRET,
-});
-
-const getAccessToken = () => kcAdminClient.getAccessToken();
-
-// Configure the API connection
-const configuration = new Configuration({
-  basePath: 'https://my-keycloak-host/auth/realms',
-  accessToken: getAccessToken,
-});
-```
+- [Phase Two API reference](https://phasetwo.io/api/): every operation, with request and response schemas.
+- The type definitions in the package document each method and model.
 
 ## Generated code
 
-The API classes and models in `src/openapi` are generated from the [Phase Two OpenAPI spec](https://github.com/p2-inc/phasetwo-docs/blob/main/openapi.yaml) by [phasetwo-sdk-generator](https://github.com/p2-inc/phasetwo-sdk-generator) (generator: [typescript-fetch](https://openapi-generator.tech/docs/generators/typescript-fetch)). Don't edit them by hand; `sdk-generator.json` records the spec commit they came from. `src/index.ts` is hand-written.
+The API classes and models in `src/openapi/` are generated from the Phase Two OpenAPI spec by [phasetwo-sdk-generator](https://github.com/p2-inc/phasetwo-sdk-generator), which opens a PR here when the spec changes. Don't edit them by hand: the `drift` check fails if they differ from the generator's output. Everything else (`src/index.ts`, `examples/`, the README) is hand-written. README code blocks are copied from `examples/` by the generator.
 
-To build:
-
-```
-npm install
-npm run build
-```
+To build: `npm ci && npm run build`.
 
 ## License
 
