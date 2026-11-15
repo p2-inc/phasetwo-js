@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Phase Two Admin REST API
- * This is a REST API reference for the Phase Two Keycloak extensions. These are extensions to the standard [Keycloak Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html), and run on your cluster alongside it.  ### Base URI format Paths specified in the documentation are relative to the base URI. - Format: `https://<your-cluster-host>/auth/realms` - Example: `https://auth.example.com/auth/realms`  `<your-cluster-host>` is your cluster\'s hostname from the Phase Two Dashboard, or a custom domain attached to it.  ### Authentication Send an access token in the `Authorization: Bearer <token>` header of every request. We recommend getting the token for a [service account](https://phasetwo.io/docs/api/service-accounts) with the client credentials grant, using a confidential client you create for API access.  A Keycloak admin client library, such as the [Keycloak Admin Client for JavaScript](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client), can take care of getting an access token and refreshing it when it expires.  #### Client credentials grant example ``` POST /auth/realms/my-realm/protocol/openid-connect/token Host: auth.example.com Accept: application/json Content-Type: application/x-www-form-urlencoded  grant_type=client_credentials&client_id=api-client&client_secret=<client-secret> ```  The response contains the access token, its type, and its lifetime in seconds: ```json {   \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",   \"token_type\": \"Bearer\",   \"expires_in\": 300 } ```  ### SDKs Modern API libraries are available for several common languages. These are available as open source at the links below, or you can choose to generate your own using our [OpenAPI spec file](https://raw.githubusercontent.com/p2-inc/phasetwo-docs/main/openapi.yaml).  | Language | Library | | --- | --- | | Java (and other JVM langs) | https://github.com/p2-inc/phasetwo-java | | JavaScript/TypeScript | https://github.com/p2-inc/phasetwo-js | | Python | https://github.com/p2-inc/phasetwo-python | 
+ * This is a REST API reference for the Phase Two Keycloak extensions. These are extensions to the standard [Keycloak Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html), and run on your cluster alongside it.  ### Base URI format Paths specified in the documentation are relative to the base URI. - Format: `https://<your-cluster-host>/auth/realms` - Example: `https://auth.example.com/auth/realms`  `<your-cluster-host>` is your cluster\'s hostname from the Phase Two Dashboard, or a custom domain attached to it.  ### Authentication Send an access token in the `Authorization: Bearer <token>` header of every request. We recommend getting the token for a [service account](https://phasetwo.io/docs/api/service-accounts) with the client credentials grant, using a confidential client you create for API access.  A Keycloak admin client library, such as the [Keycloak Admin Client for JavaScript](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client), can take care of getting an access token and refreshing it when it expires.  #### Client credentials grant example ``` POST /auth/realms/my-realm/protocol/openid-connect/token Host: auth.example.com Accept: application/json Content-Type: application/x-www-form-urlencoded  grant_type=client_credentials&client_id=api-client&client_secret=<client-secret> ```  The response contains the access token, its type, and its lifetime in seconds: ```json {   \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",   \"token_type\": \"Bearer\",   \"expires_in\": 300 } ```  ### SDKs Modern API libraries are available for several common languages. These are available as open source at the links below, or you can choose to generate your own using our [OpenAPI spec file](https://raw.githubusercontent.com/p2-inc/phasetwo-docs/main/openapi.yaml).  | Language | Library | | --- | --- | | Java (and other JVM langs) | https://github.com/p2-inc/phasetwo-java | | JavaScript/TypeScript | https://github.com/p2-inc/phasetwo-js | | Python | https://github.com/p2-inc/phasetwo-python | | Go | https://github.com/p2-inc/phasetwo-go |  See [SDKs](https://phasetwo.io/docs/api/sdks/) for installation and examples. 
  *
  * The version of the OpenAPI document: see sdk-generator.json
  * 
@@ -50,10 +50,6 @@ export interface EventRepresentation {
     /**
      * 
      */
-    organizationId?: string;
-    /**
-     * 
-     */
     type?: string;
     /**
      * 
@@ -71,6 +67,10 @@ export interface EventRepresentation {
      * 
      */
     resourceType?: string;
+    /**
+     * Id of the affected resource (set by the server).
+     */
+    readonly resourceId?: string;
     /**
      * 
      */
@@ -107,12 +107,12 @@ export function EventRepresentationFromJSONTyped(json: any, ignoreDiscriminator:
         'time': json['time'] == null ? undefined : json['time'],
         'realmId': json['realmId'] == null ? undefined : json['realmId'],
         'realmName': json['realmName'] == null ? undefined : json['realmName'],
-        'organizationId': json['organizationId'] == null ? undefined : json['organizationId'],
         'type': json['type'] == null ? undefined : json['type'],
         'representation': json['representation'] == null ? undefined : json['representation'],
         'operationType': json['operationType'] == null ? undefined : json['operationType'],
         'resourcePath': json['resourcePath'] == null ? undefined : json['resourcePath'],
         'resourceType': json['resourceType'] == null ? undefined : json['resourceType'],
+        'resourceId': json['resourceId'] == null ? undefined : json['resourceId'],
         'error': json['error'] == null ? undefined : json['error'],
         'authDetails': json['authDetails'] == null ? undefined : AuthDetailsRepresentationFromJSON(json['authDetails']),
         'details': json['details'] == null ? undefined : json['details'],
@@ -123,7 +123,7 @@ export function EventRepresentationToJSON(json: any): EventRepresentation {
     return EventRepresentationToJSONTyped(json, false);
 }
 
-export function EventRepresentationToJSONTyped(value?: EventRepresentation | null, ignoreDiscriminator: boolean = false): any {
+export function EventRepresentationToJSONTyped(value?: Omit<EventRepresentation, 'resourceId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -135,7 +135,6 @@ export function EventRepresentationToJSONTyped(value?: EventRepresentation | nul
         'time': value['time'],
         'realmId': value['realmId'],
         'realmName': value['realmName'],
-        'organizationId': value['organizationId'],
         'type': value['type'],
         'representation': value['representation'],
         'operationType': value['operationType'],

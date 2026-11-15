@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Phase Two Admin REST API
- * This is a REST API reference for the Phase Two Keycloak extensions. These are extensions to the standard [Keycloak Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html), and run on your cluster alongside it.  ### Base URI format Paths specified in the documentation are relative to the base URI. - Format: `https://<your-cluster-host>/auth/realms` - Example: `https://auth.example.com/auth/realms`  `<your-cluster-host>` is your cluster\'s hostname from the Phase Two Dashboard, or a custom domain attached to it.  ### Authentication Send an access token in the `Authorization: Bearer <token>` header of every request. We recommend getting the token for a [service account](https://phasetwo.io/docs/api/service-accounts) with the client credentials grant, using a confidential client you create for API access.  A Keycloak admin client library, such as the [Keycloak Admin Client for JavaScript](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client), can take care of getting an access token and refreshing it when it expires.  #### Client credentials grant example ``` POST /auth/realms/my-realm/protocol/openid-connect/token Host: auth.example.com Accept: application/json Content-Type: application/x-www-form-urlencoded  grant_type=client_credentials&client_id=api-client&client_secret=<client-secret> ```  The response contains the access token, its type, and its lifetime in seconds: ```json {   \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",   \"token_type\": \"Bearer\",   \"expires_in\": 300 } ```  ### SDKs Modern API libraries are available for several common languages. These are available as open source at the links below, or you can choose to generate your own using our [OpenAPI spec file](https://raw.githubusercontent.com/p2-inc/phasetwo-docs/main/openapi.yaml).  | Language | Library | | --- | --- | | Java (and other JVM langs) | https://github.com/p2-inc/phasetwo-java | | JavaScript/TypeScript | https://github.com/p2-inc/phasetwo-js | | Python | https://github.com/p2-inc/phasetwo-python | 
+ * This is a REST API reference for the Phase Two Keycloak extensions. These are extensions to the standard [Keycloak Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html), and run on your cluster alongside it.  ### Base URI format Paths specified in the documentation are relative to the base URI. - Format: `https://<your-cluster-host>/auth/realms` - Example: `https://auth.example.com/auth/realms`  `<your-cluster-host>` is your cluster\'s hostname from the Phase Two Dashboard, or a custom domain attached to it.  ### Authentication Send an access token in the `Authorization: Bearer <token>` header of every request. We recommend getting the token for a [service account](https://phasetwo.io/docs/api/service-accounts) with the client credentials grant, using a confidential client you create for API access.  A Keycloak admin client library, such as the [Keycloak Admin Client for JavaScript](https://github.com/keycloak/keycloak/tree/main/js/libs/keycloak-admin-client), can take care of getting an access token and refreshing it when it expires.  #### Client credentials grant example ``` POST /auth/realms/my-realm/protocol/openid-connect/token Host: auth.example.com Accept: application/json Content-Type: application/x-www-form-urlencoded  grant_type=client_credentials&client_id=api-client&client_secret=<client-secret> ```  The response contains the access token, its type, and its lifetime in seconds: ```json {   \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",   \"token_type\": \"Bearer\",   \"expires_in\": 300 } ```  ### SDKs Modern API libraries are available for several common languages. These are available as open source at the links below, or you can choose to generate your own using our [OpenAPI spec file](https://raw.githubusercontent.com/p2-inc/phasetwo-docs/main/openapi.yaml).  | Language | Library | | --- | --- | | Java (and other JVM langs) | https://github.com/p2-inc/phasetwo-java | | JavaScript/TypeScript | https://github.com/p2-inc/phasetwo-js | | Python | https://github.com/p2-inc/phasetwo-python | | Go | https://github.com/p2-inc/phasetwo-go |  See [SDKs](https://phasetwo.io/docs/api/sdks/) for installation and examples. 
  *
  * The version of the OpenAPI document: see sdk-generator.json
  * 
@@ -46,11 +46,11 @@ export interface WebhookSendRepresentation {
     /**
      * 
      */
-    retried?: number;
+    retries?: number;
     /**
-     * 
+     * When the send was attempted, in milliseconds since the epoch.
      */
-    sentAt?: string;
+    sentAt?: number;
     /**
      * 
      */
@@ -94,7 +94,7 @@ export function WebhookSendRepresentationFromJSONTyped(json: any, ignoreDiscrimi
         'type': json['type'] == null ? undefined : json['type'],
         'status': json['status'] == null ? undefined : json['status'],
         'statusMessage': json['status_message'] == null ? undefined : json['status_message'],
-        'retried': json['retried'] == null ? undefined : json['retried'],
+        'retries': json['retries'] == null ? undefined : json['retries'],
         'sentAt': json['sent_at'] == null ? undefined : json['sent_at'],
         'eventId': json['event_id'] == null ? undefined : json['event_id'],
         'keycloakEventType': json['keycloak_event_type'] == null ? undefined : json['keycloak_event_type'],
@@ -119,7 +119,7 @@ export function WebhookSendRepresentationToJSONTyped(value?: WebhookSendRepresen
         'type': value['type'],
         'status': value['status'],
         'status_message': value['statusMessage'],
-        'retried': value['retried'],
+        'retries': value['retries'],
         'sent_at': value['sentAt'],
         'event_id': value['eventId'],
         'keycloak_event_type': value['keycloakEventType'],
